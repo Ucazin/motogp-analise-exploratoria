@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ouvidoria do DF (OUV-DF) — O que o cidadão demanda e o que o governo resolve</title>
+<meta name="description" content="Análise exploratória de 2,15 milhões de manifestações da Ouvidoria do Distrito Federal (2016–2025). Projeto final de Introdução à Ciência de Dados — CEUB.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --azul-900:#0f2942; --azul-800:#14375a; --azul:#2a6f97; --azul-200:#bcd3e4;
+  --laranja:#e8702a; --laranja-d:#c95a1c; --verde:#2a9d8f; --verm:#c1121f;
+  --tinta:#0f172a; --cinza:#475569; --cinza-c:#64748b; --linha:#e6ebf1;
+  --bg:#f7f9fc; --branco:#fff;
+  --serif:'Fraunces',Georgia,'Times New Roman',serif;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  --maxw:1080px; --r:16px;
+  --sh:0 1px 2px rgba(15,41,66,.04),0 8px 28px -12px rgba(15,41,66,.16);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);color:var(--tinta);background:var(--bg);line-height:1.6;
+  font-feature-settings:"tnum" 1;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.08;letter-spacing:-.015em}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.eyebrow{font-size:.78rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--laranja)}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:50;background:rgba(247,249,252,.82);
+  backdrop-filter:saturate(160%) blur(12px);border-bottom:1px solid var(--linha)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:62px}
+.brand{font-family:var(--serif);font-weight:600;font-size:1.05rem;letter-spacing:-.01em}
+.brand b{color:var(--laranja)}
+.navlinks{display:flex;gap:26px;align-items:center}
+.navlinks a{font-size:.92rem;color:var(--cinza);font-weight:500}
+.navlinks a:hover{color:var(--azul-800)}
+.btn{display:inline-block;background:var(--azul-800);color:#fff;padding:9px 16px;border-radius:10px;
+  font-size:.88rem;font-weight:600;transition:background .2s}
+.btn:hover{background:var(--azul-900)}
+@media(max-width:860px){.navlinks a:not(.btn){display:none}}
+
+/* HERO */
+.hero{position:relative;background:linear-gradient(160deg,#10304e 0%,var(--azul-800) 60%,#0d2740 100%);
+  color:#eef4f9;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;opacity:.5;
+  background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:46px 46px;mask-image:radial-gradient(120% 90% at 70% 0%,#000 30%,transparent 75%)}
+.hero .wrap{position:relative;padding:64px 24px 72px}
+.hero .eyebrow{color:#ffae7a}
+.hero h1{font-size:clamp(2.4rem,6vw,4.2rem);font-weight:600;color:#fff;margin:.5rem 0 .3rem;max-width:14ch}
+.hero .lede{font-size:clamp(1.05rem,2.4vw,1.3rem);color:#cfe0ee;max-width:40ch;font-weight:400}
+.anchor{margin:40px 0 8px;display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
+.anchor .num{font-family:var(--serif);font-weight:900;font-size:clamp(3.2rem,12vw,6.6rem);
+  line-height:.9;color:#fff;letter-spacing:-.03em}
+.anchor .num span{color:var(--laranja)}
+.anchor .cap{font-size:1.02rem;color:#bcd3e4;max-width:18ch;padding-bottom:.4rem}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+.chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:999px;
+  padding:7px 15px;font-size:.86rem;color:#e7f0f7;font-weight:500}
+.chip b{color:#ffae7a}
+.authors{margin-top:30px;font-size:.92rem;color:#9fbdd4}
+.authors b{color:#fff;font-weight:600}
+
+/* SECTION */
+section.block{padding:74px 0}
+section.block.alt{background:var(--branco);border-top:1px solid var(--linha);border-bottom:1px solid var(--linha)}
+.shead{max-width:62ch;margin-bottom:38px}
+.shead h2{font-size:clamp(1.7rem,3.6vw,2.5rem);color:var(--azul-900);margin:.4rem 0 .6rem}
+.shead p{color:var(--cinza);font-size:1.06rem}
+
+/* PERGUNTA */
+.question{font-family:var(--serif);font-weight:500;font-size:clamp(1.5rem,3.6vw,2.3rem);
+  line-height:1.22;color:var(--azul-900);max-width:20ch;border-left:4px solid var(--laranja);padding-left:24px}
+.subq{margin-top:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.subq div{background:var(--bg);border:1px solid var(--linha);border-radius:12px;padding:16px 18px;font-size:.96rem;color:var(--cinza)}
+.subq b{color:var(--azul-800);display:block;font-family:var(--serif);font-weight:600;font-size:1.02rem;margin-bottom:3px}
+
+/* DATASET CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+.card{background:var(--branco);border:1px solid var(--linha);border-radius:var(--r);padding:24px;box-shadow:var(--sh)}
+section.alt .card{background:var(--bg)}
+.card .k{font-family:var(--serif);font-weight:900;font-size:2rem;color:var(--azul-800);line-height:1}
+.card .l{margin-top:8px;font-size:.95rem;color:var(--cinza)}
+.card .l b{color:var(--tinta)}
+.srcline{margin-top:26px;font-size:.95rem;color:var(--cinza)}
+.srcline a{color:var(--azul);font-weight:600;border-bottom:1px solid var(--azul-200)}
+
+/* MÉTODO */
+.steps{display:grid;gap:14px}
+.step{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;
+  background:var(--branco);border:1px solid var(--linha);border-radius:12px;padding:18px 20px}
+.step .n{font-family:var(--serif);font-weight:900;color:var(--laranja);font-size:1.3rem;line-height:1.2;min-width:1.4ch}
+.step h4{font-family:var(--sans);font-weight:600;font-size:1.02rem;color:var(--azul-900);margin-bottom:3px}
+.step p{font-size:.96rem;color:var(--cinza)}
+
+/* CHART CARDS */
+.figs{display:grid;gap:30px}
+.fig{background:var(--branco);border:1px solid var(--linha);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.fig .top{padding:24px 26px 6px}
+.fig .gnum{font-size:.76rem;font-weight:700;letter-spacing:.14em;color:var(--laranja);text-transform:uppercase}
+.fig h3{font-size:1.35rem;color:var(--azul-900);margin:5px 0 2px}
+.fig .desc{color:var(--cinza-c);font-size:.95rem}
+.canvas-box{padding:14px 22px 8px;height:380px;position:relative}
+.fig img{display:block;width:100%;height:auto;padding:10px 18px 0}
+.reading{margin:16px 26px 26px;padding:16px 20px;background:#fbf4ee;border-left:4px solid var(--laranja);
+  border-radius:0 10px 10px 0;font-size:1rem;color:#5a3c28}
+.reading b{color:var(--laranja-d)}
+@media(min-width:760px){.canvas-box{height:420px}}
+
+/* CONCLUSÕES */
+.concs{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px}
+.conc{background:var(--branco);border:1px solid var(--linha);border-radius:var(--r);padding:26px;box-shadow:var(--sh);position:relative}
+.conc .cn{font-family:var(--serif);font-weight:900;font-size:2.6rem;color:var(--azul-200);line-height:.8}
+.conc h3{font-size:1.18rem;color:var(--azul-900);margin:10px 0 8px}
+.conc p{font-size:.98rem;color:var(--cinza)}
+.takeaway{margin-top:30px;background:linear-gradient(135deg,var(--azul-800),var(--azul-900));color:#fff;
+  border-radius:var(--r);padding:30px 32px;font-family:var(--serif);font-weight:500;font-size:clamp(1.2rem,2.6vw,1.6rem);line-height:1.3}
+.takeaway b{color:#ffae7a}
+
+/* LIMITAÇÕES */
+.limit{margin-top:24px;font-size:.92rem;color:var(--cinza-c);max-width:70ch}
+.limit li{margin:4px 0 4px 18px}
+
+/* FOOTER */
+footer{background:var(--azul-900);color:#cfe0ee;padding:54px 0 40px}
+footer h3{color:#fff;font-size:1.4rem;margin-bottom:6px}
+footer .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:30px;margin-top:24px}
+footer .lab{font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:#7fa5c2;margin-bottom:8px;font-weight:600}
+footer a{color:#ffae7a;border-bottom:1px solid rgba(255,174,122,.4)}
+footer .names b{color:#fff;font-weight:600}
+footer .fine{margin-top:34px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);font-size:.85rem;color:#8fb0c9}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#topo">OUV·DF <b>/</b> análise</a>
+    <div class="navlinks">
+      <a href="#pergunta">Pergunta</a>
+      <a href="#dados">Dados</a>
+      <a href="#metodo">Método</a>
+      <a href="#analise">Análise</a>
+      <a href="#conclusoes">Conclusões</a>
+      <a href="slides.pdf" target="_blank" rel="noopener">Slides ↗</a>
+      <a class="btn" href="https://github.com/Ucazin/ouvdf-analise-exploratoria" target="_blank" rel="noopener">Repositório ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="topo">
+  <div class="wrap">
+    <p class="eyebrow">Projeto Final · Introdução à Ciência de Dados · CEUB</p>
+    <h1>Ouvidoria do Distrito Federal</h1>
+    <p class="lede">O que o cidadão demanda — e o que o governo de fato resolve.</p>
+    <div class="anchor">
+      <div class="num">2,15<span>&nbsp;mi</span></div>
+      <div class="cap">manifestações analisadas, de jul/2016 a fev/2025</div>
+    </div>
+    <div class="chips">
+      <span class="chip"><b>67%</b> são reclamações</span>
+      <span class="chip">apenas <b>9%</b> resolvidas</span>
+      <span class="chip"><b>14</b> temas · <b>35</b> regiões</span>
+      <span class="chip">fonte: <b>dados.df.gov.br</b></span>
+    </div>
+    <p class="authors">Por <b>Lucca Mariz</b> · <b>Vitor Pupe</b> · <b>Lucas Cerqueira</b></p>
+  </div>
+</header>
+
+<main>
+
+<section class="block" id="pergunta">
+  <div class="wrap reveal">
+    <p class="eyebrow">A pergunta</p>
+    <p class="question">O que a população do DF mais demanda da Ouvidoria, quem se manifesta e qual é o desfecho?</p>
+    <div class="subq">
+      <div><b>O quê</b>Que tipos e temas de manifestação predominam?</div>
+      <div><b>Quando</b>Como o volume evoluiu ao longo de quase 9 anos?</div>
+      <div><b>Quem</b>Qual o perfil de quem se manifesta (idade, sexo, região)?</div>
+      <div><b>E depois?</b>O poder público resolve o que é demandado?</div>
+    </div>
+  </div>
+</section>
+
+<section class="block alt" id="dados">
+  <div class="wrap reveal">
+    <div class="shead">
+      <p class="eyebrow">Os dados</p>
+      <h2>Um retrato de quase uma década de relação cidadão–governo</h2>
+      <p>O Sistema de Ouvidoria (OUV-DF) registra reclamações, solicitações, denúncias, elogios e sugestões. Cada linha é uma manifestação real, com tema, situação, perfil do manifestante e região.</p>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="k">2.153.285</div><div class="l">manifestações (linhas) na tabela central <b>TB_MANIFESTACAO</b></div></div>
+      <div class="card"><div class="k">17</div><div class="l">colunas — tema, tipo, situação, idade, sexo, <b>região administrativa</b>, data…</div></div>
+      <div class="card"><div class="k">2016–2025</div><div class="l">período coberto (jul/2016 a fev/2025), <b>~9 anos</b></div></div>
+      <div class="card"><div class="k">8</div><div class="l">tabelas de domínio para traduzir os códigos (Tema, Classificação, RA…)</div></div>
+    </div>
+    <p class="srcline">Fonte: Portal de Dados Abertos do GDF — “Dados Estatísticos do Sistema de Ouvidoria / OUV-DF”. Formato original ISO-8859-1, separador “;”. <a href="https://www.dados.df.gov.br/dataset/dados-abertos-do-sistema-de-ouvidoria-ouv-df" target="_blank" rel="noopener">Ver no portal ↗</a></p>
+  </div>
+</section>
+
+<section class="block" id="metodo">
+  <div class="wrap reveal">
+    <div class="shead">
+      <p class="eyebrow">Tratamento</p>
+      <h2>Completude e limpeza, com critério</h2>
+      <p>Antes de analisar, enfrentamos os problemas reais do dado — e documentamos cada decisão.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="n">01</div><div><h4>Ausências em campos opcionais (26–31%)</h4><p>Idade, sexo, bairro e região faltam em ~¼ a ⅓ dos registros. Mantivemos as linhas e filtramos por gráfico — excluí-las descartaria ~600 mil manifestações e enviesaria a análise.</p></div></div>
+      <div class="step"><div class="n">02</div><div><h4>Idades impossíveis (de −7967 a 266)</h4><p>Valores fora de [1, 110] foram tratados como erro de digitação e convertidos em nulo, preservando o resto da linha.</p></div></div>
+      <div class="step"><div class="n">03</div><div><h4>Tipagem e padronização</h4><p>A data vinha como texto no formato do SQL Server (“Oct 18 2016 6:00PM”) → convertida para data/hora (100% sem falha). 1 duplicata exata removida.</p></div></div>
+      <div class="step"><div class="n">04</div><div><h4>Decodificação dos códigos</h4><p>Os campos <code>*_id</code> foram cruzados com as tabelas de domínio para virar rótulos legíveis (Tema, Classificação, Situação, Sexo, Região).</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="block alt" id="analise">
+  <div class="wrap">
+    <div class="shead reveal">
+      <p class="eyebrow">A análise</p>
+      <h2>Oito leituras dos dados</h2>
+      <p>Quatro gráficos interativos (passe o mouse) e quatro estáticos — cada um com sua interpretação.</p>
+    </div>
+    <div class="figs">
+
+      <figure class="fig reveal">
+        <div class="top"><div class="gnum">Gráfico 1 · interativo</div><h3>Que tipo de manifestação o cidadão faz?</h3><p class="desc">Distribuição por classificação.</p></div>
+        <div class="canvas-box"><canvas id="c1" role="img" aria-label="Barras: 67% reclamações, 21% solicitações, 5% elogios, 4% denúncias"></canvas></div>
+        <p class="reading">A Ouvidoria é, antes de tudo, um <b>canal de reclamação</b>: ~67% de todas as manifestações. Elogios são apenas ~5%. O cidadão procura o canal para <b>cobrar</b>, não para parabenizar.</p>
+      </figure>
+
+      <figure class="fig reveal">
+        <div class="top"><div class="gnum">Gráfico 2 · interativo</div><h3>Sobre o que ele reclama?</h3><p class="desc">Manifestações por tema.</p></div>
+        <div class="canvas-box"><canvas id="c2" role="img" aria-label="Temas: Saúde, Transporte, Zeladoria e Habitação concentram cerca de 65%"></canvas></div>
+        <p class="reading">As demandas se concentram em <b>serviços essenciais e urbanos</b>: Saúde, Transporte/Mobilidade, Zeladoria e Habitação somam <b>~65%</b>. O sistema é movido pelo cotidiano — consulta médica, ônibus, buraco na via, iluminação.</p>
+      </figure>
+
+      <figure class="fig reveal">
+        <div class="top"><div class="gnum">Gráfico 3 · interativo</div><h3>O uso cresceu ao longo do tempo?</h3><p class="desc">Manifestações por mês (2016–2025).</p></div>
+        <div class="canvas-box"><canvas id="c3" role="img" aria-label="Linha temporal crescente, pico em março de 2022"></canvas></div>
+        <p class="reading">Adesão <b>fortemente crescente</b> desde 2016, com o canal saindo de poucos milhares para ~25–30 mil manifestações por mês e <b>pico em março de 2022</b>. As pontas (2016 e 2025) são anos parciais.</p>
+      </figure>
+
+      <figure class="fig reveal">
+        <div class="top"><div class="gnum">Gráfico 4 · interativo</div><h3>Responder é o mesmo que resolver?</h3><p class="desc">Desfecho das manifestações.</p></div>
+        <div class="canvas-box"><canvas id="c4" role="img" aria-label="76% respondida, apenas 9% resolvida, 14% não resolvida"></canvas></div>
+        <p class="reading">O achado mais delicado: <b>76%</b> ficam como “Respondida”, mas só <b>~9%</b> como “Resolvida” — contra ~14% explicitamente “Não resolvida”. <b>Responder não é resolver.</b></p>
+      </figure>
+
+      <figure class="fig reveal">
+        <div class="top"><div class="gnum">Gráfico 5</div><h3>Quem se manifesta? (idade)</h3><p class="desc">Distribuição etária dos manifestantes.</p></div>
+        <img src="img/g_idade.png" alt="Histograma de idade: concentração entre 35 e 56 anos, mediana 45">
+        <p class="reading">Público <b>adulto de meia-idade</b>: idade mediana de <b>45 anos</b>, concentrada entre ~35 e ~56. Jovens e idosos participam pouco. (1,54 mi de idades válidas.)</p>
+      </figure>
+
+      <figure class="fig reveal">
+        <div class="top"><div class="gnum">Gráfico 6</div><h3>A idade muda conforme o tipo?</h3><p class="desc">Idade por classificação (boxplot).</p></div>
+        <img src="img/g_box.png" alt="Boxplot de idade por tipo: medianas estáveis em torno de 45 anos">
+        <p class="reading">O perfil etário é <b>estável entre os tipos</b> (medianas ~45 anos). Idade praticamente <b>não diferencia</b> o tipo de manifestação — todos reclamam, solicitam e denunciam de forma parecida.</p>
+      </figure>
+
+      <figure class="fig reveal">
+        <div class="top"><div class="gnum">Gráfico 7</div><h3>De onde vêm as manifestações?</h3><p class="desc">Top 12 regiões administrativas.</p></div>
+        <img src="img/g_ra.png" alt="Barras por região: Plano Piloto concentra 31% das que informam região">
+        <p class="reading">Forte <b>concentração territorial</b>: entre as manifestações que informam a região, o <b>Plano Piloto</b> sozinho responde por <b>~31%</b> (≈21% do total), acima de regiões bem mais populosas. E ~31% sequer informam a RA.</p>
+      </figure>
+
+      <figure class="fig reveal">
+        <div class="top"><div class="gnum">Gráfico 8</div><h3>Quem demanda mais é mais atendido?</h3><p class="desc">Volume × resolução por região.</p></div>
+        <img src="img/g_scatter.png" alt="Dispersão: taxa de resolução entre 8% e 12% independente do volume">
+        <p class="reading">Não há relação positiva entre <b>demandar muito</b> e <b>ser mais atendido</b>: a resolução fica em <b>8–12%</b> independentemente do volume da região. A baixa resolução é <b>sistêmica</b>, não de uma região específica.</p>
+      </figure>
+
+    </div>
+  </div>
+</section>
+
+<section class="block" id="conclusoes">
+  <div class="wrap reveal">
+    <div class="shead">
+      <p class="eyebrow">O que aprendemos</p>
+      <h2>Quatro conclusões</h2>
+    </div>
+    <div class="concs">
+      <div class="conc"><div class="cn">1</div><h3>Um grande canal de reclamação</h3><p>67% das manifestações são reclamações e só ~5% são elogios. A OUV-DF é um termômetro direto da insatisfação com o serviço público.</p></div>
+      <div class="conc"><div class="cn">2</div><h3>Demanda por serviços essenciais</h3><p>Saúde, Transporte, Zeladoria e Habitação somam ~65% dos temas — consultas, passe estudantil, tapa-buraco e iluminação lideram.</p></div>
+      <div class="conc"><div class="cn">3</div><h3>Responder não é resolver</h3><p>76% das manifestações são “respondidas”, mas só ~9% “resolvidas”. O gap entre atendimento e solução é sistêmico e não varia entre regiões.</p></div>
+      <div class="conc"><div class="cn">4</div><h3>Acesso desigual</h3><p>O Plano Piloto concentra as manifestações; o público é adulto (mediana 45 anos) e mais feminino. Ampliar o alcance é um caminho de melhoria.</p></div>
+    </div>
+    <div class="takeaway">A Ouvidoria mostra com clareza <b>o que dói no DF</b> — o desafio que os dados revelam é <b>fechar o ciclo da resolução</b>.</div>
+    <p class="limit" style="font-weight:600;color:var(--cinza);margin-bottom:4px">Limitações (honestidade da análise):</p>
+    <ul class="limit">
+      <li>26–31% dos campos opcionais ausentes — tratados por filtragem, não por exclusão de linhas.</li>
+      <li>“Respondida” depende de confirmação posterior do cidadão; parte do baixo índice de “resolvida” pode refletir não-confirmação.</li>
+      <li>2016 e 2025 são anos parciais. A análise é descritiva, não causal.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <h3>Ouvidoria do DF — Análise Exploratória</h3>
+    <p style="max-width:60ch;color:#9fbdd4">Projeto final da disciplina Introdução à Ciência de Dados — Centro Universitário de Brasília (CEUB), Prof. MsC Pedro H. Mello.</p>
+    <div class="grid">
+      <div><div class="lab">Integrantes</div><p class="names"><b>Lucca Mariz</b><br><b>Vitor Pupe</b><br><b>Lucas Cerqueira</b></p></div>
+      <div><div class="lab">Fonte dos dados</div><p>Portal de Dados Abertos do GDF<br><a href="https://www.dados.df.gov.br/dataset/dados-abertos-do-sistema-de-ouvidoria-ouv-df" target="_blank" rel="noopener">Sistema de Ouvidoria OUV-DF ↗</a></p></div>
+      <div><div class="lab">Código & notebook</div><p><a href="https://github.com/Ucazin/ouvdf-analise-exploratoria" target="_blank" rel="noopener">github.com/Ucazin/ouvdf-analise-exploratoria ↗</a><br>Notebook, dados e slides.</p></div>
+    </div>
+    <p class="fine">Feito em Python (pandas · matplotlib · seaborn) e gráficos interativos em Chart.js. Dados públicos sob licença de dados abertos do GDF.</p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function(){
+  var D = window.OUVDF || {};
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // reveal on scroll
+  var obs = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target);} });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+
+  if(!window.Chart){ return; }
+  var AZULD="#14375a",AZUL="#2a6f97",AZUL2="#5a93b8",LARANJA="#e8702a",VERDE="#2a9d8f",VERM="#c1121f",CINZA="#64748b",LINHA="#e6ebf1";
+  Chart.defaults.font.family="'IBM Plex Sans',system-ui,sans-serif";
+  Chart.defaults.font.size=13; Chart.defaults.color=CINZA;
+  var ANIM = reduce ? false : {duration:900,easing:'easeOutQuart'};
+  var fmt = function(v){ return (v/1000).toFixed(0)+' mil'; };
+  var pctOf = function(arr){ var t=arr.reduce((a,b)=>a+b,0); return function(v){return (v/t*100).toFixed(1)+'%';}; };
+
+  // G1 classificação (barra horizontal)
+  if(D.classificacao){
+    var c=D.classificacao, lab=c.map(x=>x.label), val=c.map(x=>x.value);
+    var cor=lab.map(l=> l==='Reclamação'?LARANJA:AZUL);
+    new Chart(document.getElementById('c1'),{type:'bar',
+      data:{labels:lab,datasets:[{data:val,backgroundColor:cor,borderRadius:6,maxBarThickness:34}]},
+      options:{indexAxis:'y',animation:ANIM,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw.toLocaleString('pt-BR')+' ('+c[ctx.dataIndex].pct+'%)'}}},
+        scales:{x:{ticks:{callback:fmt},grid:{color:LINHA}},y:{grid:{display:false}}}}});
+  }
+  // G2 temas (barra horizontal, todos)
+  if(D.temas){
+    var t=D.temas.slice().sort((a,b)=>a.value-b.value);
+    new Chart(document.getElementById('c2'),{type:'bar',
+      data:{labels:t.map(x=>x.label),datasets:[{data:t.map(x=>x.value),backgroundColor:AZUL,borderRadius:5,maxBarThickness:22}]},
+      options:{indexAxis:'y',animation:ANIM,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw.toLocaleString('pt-BR')+' ('+t[ctx.dataIndex].pct+'%)'}}},
+        scales:{x:{ticks:{callback:fmt},grid:{color:LINHA}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
+  }
+  // G3 série mensal (linha/área)
+  if(D.serie){
+    var s=D.serie;
+    new Chart(document.getElementById('c3'),{type:'line',
+      data:{labels:s.map(p=>p.x),datasets:[{data:s.map(p=>p.y),borderColor:AZUL,backgroundColor:'rgba(42,111,151,.14)',
+        fill:true,tension:.32,pointRadius:0,pointHoverRadius:5,borderWidth:2.4}]},
+      options:{animation:ANIM,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{title:items=>items[0].label,label:ctx=>ctx.raw.toLocaleString('pt-BR')+' manifestações'}}},
+        scales:{y:{ticks:{callback:fmt},grid:{color:LINHA}},
+          x:{grid:{display:false},ticks:{maxRotation:0,autoSkip:false,callback:function(v){var l=this.getLabelForValue(v);return /-01$/.test(l)?l.slice(0,4):'';}}}}}});
+  }
+  // G4 desfecho (barra vertical, cores semânticas)
+  if(D.desfecho){
+    var d=D.desfecho, cor=[VERDE,AZUL,VERM,CINZA], pf=pctOf(d.map(x=>x.value));
+    new Chart(document.getElementById('c4'),{type:'bar',
+      data:{labels:d.map(x=>x.label.replace(' (sem confirmação)','\n(sem confirmação)')),
+        datasets:[{data:d.map(x=>x.value),backgroundColor:cor,borderRadius:7,maxBarThickness:90}]},
+      options:{animation:ANIM,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw.toLocaleString('pt-BR')+' ('+pf(ctx.raw)+')'}}},
+        scales:{y:{ticks:{callback:fmt},grid:{color:LINHA}},x:{grid:{display:false},ticks:{font:{size:11}}}}}});
+  }
+})();
+</script>
+</body>
+</html>
