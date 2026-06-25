@@ -1,0 +1,26 @@
+# IDE
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Sistema
+Thumbs.db
+.DS_Store
+
+# Dados brutos OUV-DF na RAIZ (não versionar; use data/ — versão tratada/compacta)
+/OUV*.csv
+/OUV*
+/Dados Estatísticos*
+/Dicionário de Dados*
+/dados-abertos-do-sistema-de-ouvidoria-ouv-df.zip
+
+# Tabelas brutas pesadas que não cabem no GitHub (>100 MB) e não são usadas na análise
+data/*Localiza*
+data/*Resposta*
+data/TB_*.csv
